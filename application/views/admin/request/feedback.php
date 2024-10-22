@@ -1,0 +1,291 @@
+<?php
+  if ($level == "2") { $acc = 'pm_acc'; } 
+  elseif ($level == "3") { $acc = 'ci_acc'; } 
+  elseif ($level == "4") { $acc = 'struk_acc'; } 
+  elseif ($level == "5") { $acc = 'pme_acc'; } 
+  elseif ($level == "6") { $acc = 'qe_acc'; } 
+  elseif ($level == "7") { $acc = 're_acc'; } 
+  elseif ($level == "10") { $acc = 'owner_acc'; } 
+?>
+<?php foreach ($data2 as $produksi) { ?> 
+<ol class="breadcrumb">
+  <li><a href="<?php echo site_url('admin/home');?>"><i class="fa fa-dashboard"> </i> Home</a></li>
+  <li><a href="<?php echo site_url('admin/cek');?>">Request Pekerjaan</a></li>
+  <li class="active">Preview #<?php echo $nomor; ?></li>
+</ol>
+<div id="myalert">
+  <?php echo $this->session->flashdata('alert', true)?>
+</div>
+<section class="invoice">
+  <div class="row">
+    <div class="col-xs-12">
+        <h4 class="pull-left page-header">
+        <i class="fa fa-briefcase"></i> Tanggal Pengajuan <?php echo date_indo($produksi['tanggal_pengajuan']); ?>
+        </h4>
+        <h4 class="pull-right page-header">
+        Tanggal Pelaksanaan <?php echo date_indo($produksi['tanggal_pelaksanaan']); ?>
+        </h4>
+    </div>
+  </div>
+  <div class="row invoice-info">
+    <div class="col-sm-12 invoice-col">
+        <small class="pull-right">
+        <?php $status = $this->CRUD_model->get_acc_request($nomor,$acc);
+            if ($status==0) {
+              echo"<a class='btn btn-warning btn-xs'> <i>BELUM DIPERIKSA</i></a>";
+            } elseif ($status==1) {
+              echo"<a class='btn btn-danger btn-xs'> <i>BELUM DISETUJUI</i></a>";
+            } elseif ($status==2) {
+              echo"<a class='btn btn-success btn-xs'> <i>DISETUJUI</i></a>";
+            } 
+        ?> 
+        </small>
+      <strong>PERMOHONAN IJIN PEKERJAAN</strong> <i>(Request For Work)</i>
+      <address>
+        <table border="0">
+          <tr>
+            <td> Nama Proyek </td>
+            <td> : <?php echo $site['nama_proyek']; ?> </td>
+          </tr>
+          <tr>
+            <td> Kontraktor Pelaksana </td>
+            <td> : <?php echo $site['kontraktor_pelaksana']; ?> </td>
+          </tr>
+          <tr>
+            <td> Nomor Kontrak </td>
+            <td> : <?php echo $site['no_kontrak']; ?> </td>
+          </tr>
+          <tr>
+            <td> Tanggal Kontrak </td>
+            <td> : <?php echo date_indo($site['tanggal_kontrak']); ?> </td>
+          </tr>
+        </table>
+      </address>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12 table-responsive">
+      <table id="example1" class="table table-bordered table-hover">
+        <thead>
+        <tr>
+          <th style="width: 20px;">No</th>
+          <th style="text-align: center;">Mata Pembayaran</th>
+          <th style="text-align: center;">Nama Pekerjaan</th>
+          <th style="text-align: center;">Estimasi Volume</th>
+          <th style="text-align: center;">Satuan</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php  $no = 1; foreach ($data3 as $u) { ?>
+        <tr>
+        <td><?php echo $no; ?></td>
+        <td style="text-align: center;"><?php echo $u['mata_pembayaran']; ?></td>
+        <td style="text-align: center;"><?php echo $u['nama']; ?></td>
+        <td style="text-align: center;"><?php echo $u['volume']; ?></td>
+        <td style="text-align: center;"><?php echo $u['satuan']; ?></td>
+        </tr>
+        <?php $no++; } ?>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- LAMPIRAN -->
+<section class="invoice">
+  <div class="row">
+    <div class="col-xs-6">
+      <h4 class="page-header">
+        <i class="fa fa-file-text-o"></i> Lampiran
+        <small class="pull-right">-</small>
+      </h4>
+    </div>
+  </div>
+  <div class="row invoice-info">
+    <div class="col-sm-12 invoice-col">
+      <div class="nav-tabs-custom">
+        <ul class="nav nav-tabs">
+          <li class="active"><a href="#tab_1" data-toggle="tab">Gambar Kerja</a></li>
+          <li><a href="#tab_2" data-toggle="tab">Metode Pelaksanaan</a></li>
+          <li><a href="#tab_3" data-toggle="tab">Data Hasil Uji Lab.</a></li>
+          <li><a href="#tab_4" data-toggle="tab">Tenaga Kerja</a></li>
+          <li><a href="#tab_5" data-toggle="tab">Material</a></li>
+          <li><a href="#tab_6" data-toggle="tab">Peralatan</a></li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane active" id="tab_1">
+            <h4> <?php if ($produksi['id_gambar_kerja']=='-') { echo "Tidak ada lampiran."; } else { 
+              $where = array('id_gambar_kerja' => $produksi['id_gambar_kerja']);
+              $gambar = $this->CRUD_model->edit_data($where,'gambar_kerja')->result(); ?>
+             </h4>
+            <?php foreach ($gambar as $gambar) { ?> 
+            <table>
+              <tr> <td>No. Gambar Kerja </td> <td>&nbsp; : &nbsp; <?php echo$gambar->no_gambar; ?> </td> </tr>
+              <tr> <td>Judul Gambar Kerja </td> <td>&nbsp; : &nbsp; <?php echo$gambar->judul_gambar; ?> </td> </tr>
+              <tr> <td>Jenis Gambar Kerja </td> <td>&nbsp; : &nbsp; <?php echo$gambar->jenis_gambar; ?> </td> </tr>
+              <tr> <td>Jumlah Halaman </td> <td>&nbsp; : &nbsp; <?php echo$gambar->jumlah_halaman_gambar; ?> </td> </tr>
+              <tr> <td>Klasifikasi Gambar Kerja </td> <td>&nbsp; : &nbsp; <?php echo$gambar->klasifikasi_gambar; ?> </td> </tr>
+              <tr> <td>Keterangan </td> <td>&nbsp; : &nbsp; <?php echo$gambar->keterangan_gambar; ?> </td> </tr>
+              <tr> <td>Link Dokumen </td> <td>&nbsp; : &nbsp; <a href="<?php echo $gambar->link_gambar; ?>" class="btn btn-info btn-xs" target="_blank"><i class="fa fa-link"> Klik disini untuk membuka link</i></a>  </td> </tr>
+            </table>
+            <?php } }?> 
+          </div>
+          <div class="tab-pane" id="tab_2">
+            <h4> <?php if ($produksi['id_metode']=='-') { echo "Tidak ada lampiran."; } else { 
+              $where = array('id_metode' => $produksi['id_metode']);
+              $metode = $this->CRUD_model->edit_data($where,'metode')->result(); ?>
+             </h4>
+            <?php foreach ($metode as $metode) { ?> 
+            <table>
+              <tr> <td>No. Metode Kerja </td> <td>&nbsp; : &nbsp; <?php echo$metode->no_metode; ?> </td> </tr>
+              <tr> <td>Judul Metode Kerja </td> <td>&nbsp; : &nbsp; <?php echo$metode->judul_metode; ?> </td> </tr>
+              <tr> <td>Jumlah Halaman </td> <td>&nbsp; : &nbsp; <?php echo$metode->jumlah_halaman_metode; ?> </td> </tr>
+              <tr> <td>Klasifikasi Metode Kerja </td> <td>&nbsp; : &nbsp; <?php echo$metode->klasifikasi_metode; ?> </td> </tr>
+              <tr> <td>Keterangan </td> <td>&nbsp; : &nbsp; <?php echo$metode->keterangan_metode; ?> </td> </tr>
+              <tr> <td>Link Dokumen </td> <td>&nbsp; : &nbsp; <a href="<?php echo $metode->link_metode; ?>" class="btn btn-info btn-xs" target="_blank"><i class="fa fa-link"> Klik disini untuk membuka link</i></a>  </td> </tr>
+            </table>
+            <?php } }?> 
+          </div>
+          <div class="tab-pane" id="tab_3">
+            <h4> <?php if ($produksi['id_data_quality']=='-') { echo "Tidak ada lampiran."; } else { 
+              $where = array('id_data_quality' => $produksi['id_data_quality']);
+              $data_quality = $this->CRUD_model->edit_data($where,'data_quality')->result(); ?>
+             </h4>
+            <?php foreach ($data_quality as $data_quality) { ?> 
+            <table>
+              <tr> <td>No. Metode Kerja </td> <td>&nbsp; : &nbsp; <?php echo$data_quality->no_data_quality; ?> </td> </tr>
+              <tr> <td>Judul Metode Kerja </td> <td>&nbsp; : &nbsp; <?php echo$data_quality->judul_data_quality; ?> </td> </tr>
+              <tr> <td>Klasifikasi Metode Kerja </td> <td>&nbsp; : &nbsp; <?php echo$data_quality->klasifikasi_data_quality; ?> </td> </tr>
+              <tr> <td>Keterangan </td> <td>&nbsp; : &nbsp; <?php echo$data_quality->keterangan_data_quality; ?> </td> </tr>
+              <tr> <td>Link Dokumen </td> <td>&nbsp; : &nbsp; <a href="<?php echo site_url('assets/upload/dokumen/'.$data_quality->berkas);?>" class="btn btn-info btn-xs" target="_blank"><i class="fa fa-link"> Link dokumen</i></a>   </td> </tr>
+            </table>
+            <?php } }?> 
+          </div>
+          <div class="tab-pane" id="tab_4">
+            <?php 
+              $this->db->select('*')->from('detail_tenaga a');
+              $this->db->join('tenaga b', 'b.id_tenaga = a.id_tenaga','left')->where('a.id_request', $nomor);
+              $tenaga = $this->db->get()->result_array();
+            ?>
+            <table>
+              <?php foreach ($tenaga as $tenaga) { ?> 
+              <tr> <td><?php echo$tenaga['tenaga']; ?>  </td> <td>&nbsp; : &nbsp; <?php echo$tenaga['jumlah']; ?> Orang </td> </tr>
+              <?php } ?> 
+            </table> 
+          </div>
+          <div class="tab-pane" id="tab_5">
+            <?php 
+              $this->db->select('*')->from('detail_material a');
+              $this->db->join('material b', 'b.id_material = a.id_material','left')->where('a.id_request', $nomor);
+              $material = $this->db->get()->result_array();
+            ?>
+            <table>
+              <?php foreach ($material as $material) { ?> 
+              <tr> <td><?php echo$material['material']; ?>  </td> <td>&nbsp; : &nbsp; <?php echo$material['jumlah']; ?> </td> </tr>
+              <?php } ?> 
+            </table> 
+          </div>
+          <div class="tab-pane" id="tab_6">
+            <?php 
+              $this->db->select('*')->from('detail_peralatan a');
+              $this->db->join('peralatan b', 'b.id_peralatan = a.id_peralatan','left')->where('a.id_request', $nomor);
+              $peralatan = $this->db->get()->result_array();
+            ?>
+            <table>
+              <?php foreach ($peralatan as $peralatan) { ?> 
+              <tr> <td><?php echo$peralatan['peralatan']; ?>  </td> <td>&nbsp; : &nbsp; <?php echo$peralatan['jumlah']; ?> </td> </tr>
+              <?php } ?> 
+            </table> 
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+    <!-- /.content -->
+<section class="invoice">
+  <div class="row">
+    <div class="col-xs-6 ">
+      <div class="box box-solid">
+        <div class="box-header">
+          <h3 class="box-title" align="center"><i class="fa fa-feed"></i> Feedback</h3>
+        </div>
+        <div class="box-body">
+          <form class="form-horizontal" method="post" action="<?php echo site_url('admin/cek/simpan_feedback');?>">
+            <input type="hidden" name="nama_kolom" value="<?php echo $acc; ?>"> 
+            <input type="hidden" name="nomor" value="<?php echo $produksi['id_request']; ?>">
+            <div class="box-body">
+              <div class="form-group">
+                <label class="col-sm-2 control-label">Persetujuan</label>
+                <div class="col-sm-4">
+                  <select class="form-control select" name="acc" required>
+                    <option value="1"> Belum Setujui </option>
+                    <option value="2"> Setujui </option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">Feedback</label>
+                <div class="col-sm-9">
+                  <div class="form-group">
+                    <textarea style="margin-left:13px;" class="form-control" rows="3" name="keterangan" placeholder="Feedback ..."></textarea>
+                  </div>
+                  <hr>
+                  <button type="submit" class="form-control btn btn-danger pull-right"><i class="fa fa-send"></i> Berikan Feedback</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+    </div>
+  </div>
+    <div class="col-xs-6 ">
+      <div class="box box-solid">
+        <div class="box-header">
+          <h3 class="box-title" align="center"><i class="fa fa-history"></i> History Feedback</h3>
+        </div>
+        <div class="box-body">
+        <div class="col-xs-12 table-responsive">
+          <table id="example1" class="table table-bordered table-hover">
+            <thead>
+            <tr>
+              <th style="width: 20px;">No</th>
+              <th style="text-align: center;">Tanggal</th>
+              <th style="text-align: center;">Status</th>
+              <th style="text-align: center;">Feedback</th>
+              <th style="text-align: center;">Aksi</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php 
+            $no = 1;
+            $sum = 0;
+            foreach ($history as $history) {
+            ?>
+            <tr>
+            <td><?php echo $no; ?></td>
+            <td style="text-align: center;"><?php echo date_indo($history['tanggal']); ?></td>
+            <td style="text-align: center;"><?php if ($history['status']==1) { echo"<a class='btn btn-danger btn-xs'>Belum Disetujui</a>";} else { echo"<a class='btn btn-success btn-xs'>Disetujui</a>";} ?></td>
+            <td style="text-align: center;"><?php echo $history['keterangan']; ?></td>
+            <td align="center">
+            <button class="btn btn-danger btn-xs">  
+            <?php echo anchor('admin/cek/hapus_feedback/'.$history['id_feedback'].'/'.$history['id_laporan_harian'], '<i style="color: white;" class="fa fa-trash"> HAPUS</i>', array('class'=>'delete', 'onclick'=>"return confirmDialog();")); ?>   
+            </button> 
+            </td>
+            </tr>
+            <?php } ?> 
+            </tbody>
+          </table>
+           <h4> <?php if ($history==NULL) { echo "Anda belum memberikan feedback."; } ?></h4>
+        </div>
+        </div>
+    </div>
+  </div>
+</div>
+</section>
+    <?php } ?> 
+  <script>
+  function confirmDialog() {
+    return confirm('Apakah anda yakin akan menghapus feedback ini?')
+  }
+  </script>
